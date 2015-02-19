@@ -1,0 +1,111 @@
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+
+\newtheorem*{bgthm}{Theorem}
+\newtheorem{thm}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{coro}{Corollary}
+\newtheorem{defn}{Definition}
+\newtheorem*{assu}{Assumption}
+\newtheorem{note}{Note}
+\newtheorem{conj}{Conjecture}
+
+\newcommand{\upto}{\nearrow}
+\newcommand{\toprob}{\stackrel{\text{P}}{\to}}
+\newcommand{\tod}{\stackrel{\text{D}}{\to}}
+\newcommand{\eqd}{\overset{\text{D}}{=}}
+\newcommand{\ind}[1]{{\mathbb{I}(#1)}}
+\newcommand{\iid}{i.i.d.\ }
+\newcommand{\inid}{i.n.i.d.\ }
+\newcommand{\covarsX}{\mathcal{X}}
+\newcommand{\covarsZ}{\mathcal{Z}}
+\newcommand{\filt}{\mathcal{F}}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\natrs}{\mathbb{N}}
+\newcommand{\abc}{\mathcal{A}}
+\providecommand{\vnorm}[1]{\lVert#1\rVert}
+
+\DeclareMathOperator*{\plim}{plim}
+\DeclareMathOperator{\bern}{Bern}
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\logitinv}{logit^{-1}}
+\DeclareMathOperator{\dtheta}{\frac{\partial}{\partial \theta}}
+\DeclareMathOperator{\ddtheta}{\frac{\partial^2}{\partial \theta^2}}
+\DeclareMathOperator{\ev}{\mathbb{E}}
+\DeclareMathOperator{\var}{\mathbb{V}}
+\DeclareMathOperator{\cov}{Cov}
+\DeclareMathOperator{\prob}{\mathbb{P}}
+\DeclareMathOperator{\norm}{N}
+\DeclareMathOperator{\gam}{Gamma}
+\DeclareMathOperator{\expo}{Exp}
+\DeclareMathOperator{\pois}{Poisson}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\esssup}{ess\,sup}
+\DeclareMathOperator{\essinf}{ess\,inf}
+\DeclareMathOperator{\mgf}{\varphi}
+\DeclareMathOperator{\chf}{\varphi^{\text{c}}}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\Log}{Log}
+
+\begin{document}
+
+Thoughts on formally modeling the ``matched read stitching'' problem
+that Brendan Hickey described on 2014-10-18. The current version was
+generated on \fbox{\today}.
+
+\section*{Model}
+
+Let $\abc$ be some finite alphabet. Since we're talking about DNA, we
+probably have $\abc = \{ A, C, G, T \}$, but it may be convenient to
+add wildcard characters like $N$.
+
+Our experimental setup, as I understand it, is that there is a stretch
+of DNA whose sequence we are interested in. We can flank the area of
+interest with two primers, one for each of the strands. We index the
+read sequences from the beginning of each of the primers starting from
+$1$. Choosing one of the strands arbitrarily, we interpret both reads
+as coming from the same strand, so that if location $i$ on the chosen
+strand and $j$ on the other strand index the same base pair on the
+sequence of interest and they are both true reads, then they are
+interpreted as being the same base and not complementary ones. In
+addition to the sequence of the reads, the apparatus may also output
+``quality scores'', which are hopefully well-calibrated measures of
+the probability that the reported read is correct.
+
+We let $Z$ denote the true (unobserved) sequence of interest, indexed
+from the two primers as described above. This sequence has length $N$,
+and we have that indices $i$ from the first strand and $N-i+1$ from the
+second strand refer to the same location, for $i = 1, \ldots,
+N$. Formally, $Z \in \abc^N$.
+
+Our (random) observered data are the pair of reads $Y^1 \in
+\abc^{n_1}$, $Y^2 \in \abc^{n_2}$, and their corresponding quality
+scores $q^1 \in [0,1]^{n_1}$, $q^2 \in [0,1]^{n_2}$. Although $n_1$
+and $n_2$ are random variables, these read lengths clearly
+contain no information useful for inference about $Z$ under any
+reasonable model. On the other hand, specifying their distribution is
+necessary in describing a full generative model for the data. As a
+simple choice, we say that $n_1, n_2 \overset{\text{iid}}{\sim}
+R(\theta_R)$, where $R(\theta_R)$ takes values in $\{ 0, 1, 2, \ldots
+\}$ and $\theta_R$ parameterizes this family. Since there is no point
+in learning $\theta_R$ in this setting, we can suppose that $\theta_R$
+is estimated from the literature or from a separate experiment
+conducted for this purpose.
+
+A probabilistic model for $Y^1$ and $Y^2$ requires an additional
+piece, a representation of the latent (unobserved, random) error
+process that describes the deviations of the read from the true
+sequence. We start by defining a sequence $( e_i ) \subset [0,1]$ that
+gives the read error rate at index $i$ in a read. We might thing that
+there is some connection between this and the quality score, but this
+might not be the case, particularly if $q^1$, $q^2$ are not
+well-calibrated. We then let $X_i^1 \overset{\text{iid}}{\sim} \bern(e_i)$
+
+\end{document}
